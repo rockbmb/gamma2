@@ -2,7 +2,7 @@ name:                   gamma
 version:                0.10.0.0
 stability:              provisional
 
-cabal-version:          > 1.8
+cabal-version:          >= 1.9
 build-type:             Simple
 
 author:                 James Cook <mokus@deepbondi.net>
