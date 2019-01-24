@@ -296,21 +296,21 @@ class Gamma a => GenGamma a where
     lnGeneralizedGamma :: Int -> a -> a
 
 instance GenGamma Float where
-    generalizedGamma   p x = double2Float $ (generalizedGamma   :: Int -> Double -> Double) p (float2Double x)
-    lnGeneralizedGamma p x = double2Float $ (lnGeneralizedGamma :: Int -> Double -> Double) p (float2Double x)
+    generalizedGamma   u x = double2Float $ (generalizedGamma   :: Int -> Double -> Double) u (float2Double x)
+    lnGeneralizedGamma u x = double2Float $ (lnGeneralizedGamma :: Int -> Double -> Double) u (float2Double x)
 
 instance GenGamma Double where
-    generalizedGamma p x
-        | p <= 0    = error "generalizedGamma p x: p must be strictly positive."
-        | p == 1    = gamma x
-        | otherwise = pi ** (0.25 * p' * (p' - 1)) 
-            * product [ gamma (x - 0.5 * fromIntegral j) | j <- [0 .. p - 1]]
-        where p' = fromIntegral p
+    generalizedGamma u x
+        | u <= 0    = error "generalizedGamma p x: p must be strictly positive."
+        | u == 1    = gamma x
+        | otherwise = pi ** (0.25 * u' * (u' - 1))
+            * product [ gamma (x - 0.5 * fromIntegral j) | j <- [0 .. u - 1]]
+        where u' = fromIntegral u
 
-    lnGeneralizedGamma p x
-        | p <= 0    = error "lnGeneralizedGamma p x: p must be strictly positive."
-        | p == 1    = lnGamma x
-        | otherwise = (0.25 * log pi) * (p' * (p' - 1)) 
-            + sum [ lnGamma (x - 0.5 * fromIntegral j) | j <- [0 .. p - 1]]
-        where p' = fromIntegral p
+    lnGeneralizedGamma u x
+        | u <= 0    = error "lnGeneralizedGamma p x: p must be strictly positive."
+        | u == 1    = lnGamma x
+        | otherwise = (0.25 * log pi) * (u' * (u' - 1))
+            + sum [ lnGamma (x - 0.5 * fromIntegral j) | j <- [0 .. u - 1]]
+        where u' = fromIntegral u
 
