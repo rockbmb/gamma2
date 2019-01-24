@@ -9,7 +9,7 @@ author:                 James Cook <mokus@deepbondi.net>
 maintainer:             James Cook <mokus@deepbondi.net>
                         Alexandre Rodrigues Baldé <alexandrer_b@outlook.com>
 license:                PublicDomain
-homepage:               https://github.com/mokus0/gamma
+homepage:               https://github.com/rockbmb/gamma2
 
 category:               Math, Numerical
 synopsis:               Gamma function and related functions.
@@ -22,7 +22,7 @@ extra-source-files:     extras/*.hs
 
 source-repository head
   type: git
-  location: git://github.com/rockbmb/gamma.git
+  location: git://github.com/rockbmb/gamma2.git
 
 Library
   hs-source-dirs:       src
