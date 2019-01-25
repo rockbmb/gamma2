@@ -10,13 +10,13 @@ import Math.Gamma.Lanczos
 import Math.Gamma.Incomplete
 import Math.Factorial
 
-import Data.Complex
-import Data.List (findIndex)
-import GHC.Float (float2Double, double2Float)
+import Data.Complex                  (Complex (..))
+import Data.List                     (findIndex)
+import GHC.Float                     (float2Double, double2Float)
 import qualified Data.Vector.Unboxed as V
-import Language.Haskell.TH (litE, Lit(IntegerL))
-import Math.ContinuedFraction
-import Math.Sequence.Converge
+import Language.Haskell.TH           (litE, Lit(IntegerL))
+import Math.ContinuedFraction        (modifiedLentz)
+import Math.Sequence.Converge        (converge)
 
 -- |Gamma function.  Minimal definition is ether 'gamma' or 'lnGamma'.
 class (Eq a, Floating a, Factorial a) => Gamma a where

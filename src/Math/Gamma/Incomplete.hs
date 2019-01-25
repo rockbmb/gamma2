@@ -5,9 +5,10 @@ module Math.Gamma.Incomplete
     , upperGammaCF, lnUpperGammaConvergents, qCF
     ) where
 
-import {-# SOURCE #-}  Math.Gamma
-import Math.ContinuedFraction
-import Math.Sequence.Converge
+import {-# SOURCE #-} Math.Gamma
+
+import Math.ContinuedFraction    (CF, gcf, modifiedLentzWith, sumPartialProducts)
+import Math.Sequence.Converge    (converge)
 
 -- |Continued fraction representation of the lower incomplete gamma function.
 lowerGammaCF :: (Floating a, Ord a) => a -> a -> Math.ContinuedFraction.CF a

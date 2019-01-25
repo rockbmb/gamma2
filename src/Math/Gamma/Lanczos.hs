@@ -14,7 +14,7 @@ module Math.Gamma.Lanczos
     , reflectLn, reflectLnC
     ) where
 
-import Data.Complex
+import Data.Complex (Complex, imagPart, realPart)
 
 -- |Compute Lanczos' approximation to the gamma function, using the specified
 -- constants.  Valid for Re(x) > 0.5.  Use 'reflect' or 'reflectC' to extend

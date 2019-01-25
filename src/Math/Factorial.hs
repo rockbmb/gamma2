@@ -1,9 +1,11 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Math.Factorial where
+module Math.Factorial
+    ( Factorial (..)
+    ) where
 
-import Data.Complex
+import Data.Complex                  (Complex (..))
 import qualified Data.Vector.Unboxed as V
-import GHC.Float (double2Float)
+import GHC.Float                     (double2Float)
 
 -- |Factorial function
 class Num a => Factorial a where
