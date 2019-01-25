@@ -1,5 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-module Reference where
+module Math.Reference where
 
 import Data.Number.BigFloat
 import Math.Gamma.Lanczos

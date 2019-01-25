@@ -1,7 +1,7 @@
 {-# LANGUAGE ImplicitParams #-}
-module IncGammaTests where
+module Math.IncGammaTests where
 
-import GammaTests (eps, isSane, (~=))
+import Math.GammaTests (eps, isSane, (~=))
 
 import Data.Complex
 import Data.Number.Erf

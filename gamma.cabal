@@ -2,7 +2,7 @@ name:                   gamma
 version:                0.10.0.0
 stability:              provisional
 
-cabal-version:          >= 1.9
+cabal-version:          >= 1.10
 build-type:             Simple
 
 author:                 James Cook <mokus@deepbondi.net>
@@ -24,7 +24,7 @@ source-repository head
   type: git
   location: git://github.com/rockbmb/gamma2.git
 
-Library
+library
   hs-source-dirs:       src
   ghc-options:          -Wall
   exposed-modules:      Math.Factorial
@@ -37,3 +37,24 @@ Library
                         converge,
                         template-haskell,
                         vector >= 0.5
+  default-language: Haskell2010
+
+test-suite gamma-tests
+  ghc-options:          -threaded
+  hs-source-dirs:       test-suite
+  default-language:     Haskell2010
+  ghc-options:          -Wall
+  type:                 exitcode-stdio-1.0
+  main-is:              Test.hs
+  build-depends:
+    base >= 4.9 && <5,
+    erf,
+    gamma,
+    numbers,
+    QuickCheck >= 2.1.1,
+    test-framework,
+    test-framework-quickcheck2
+  other-modules:
+    Math.GammaTests
+    Math.IncGammaTests
+    Math.Reference
