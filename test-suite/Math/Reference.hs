@@ -1,7 +1,11 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
-module Math.Reference where
+module Math.Reference
+    ( err
+    , tgamma
+    , lgamma
+    ) where
 
 import Data.Number.BigFloat (BigFloat, Prec50)
 import Math.Gamma.Lanczos   (gammaLanczos, reflect)
