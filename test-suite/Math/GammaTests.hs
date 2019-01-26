@@ -1,27 +1,34 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ImplicitParams   #-}
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
-module Math.GammaTests where
+module Math.GammaTests
+    ( eps
+    , isSane
+    , tests
+    , (~=)
+    ) where
 
-import Math.Reference
+import qualified Math.Gamma                 as G
+import Math.Reference                       (err, lgamma, tgamma)
 
-import Control.Applicative
-import Data.Complex
-import Math.Gamma
-import Test.Framework (testGroup, Test)
+import Data.Complex                         (Complex (..), conjugate, imagPart,
+                                             magnitude, realPart)
+import Test.Framework                       (testGroup, Test)
 import Test.Framework.Providers.QuickCheck2 (testProperty)
-import Test.QuickCheck
+import Test.QuickCheck                      (Arbitrary, NonNegative (..), Positive (..),
+                                             (==>))
 
 gammaSign :: (RealFrac a, Fractional t) => a -> t
 gammaSign x
     | x > 0     = 1
     | otherwise = case properFraction x of
-        (n, 0)              -> 0/0
-        (n, f)  | odd n     ->   1
+        (_, 0)              -> 0/0
+        (n, _)  | odd n     ->   1
                 | otherwise ->  -1
+
 gammaArg :: RealFrac a => a -> Bool
 gammaArg = not . isNaN . gammaSign
-gammaArgC z = imagPart z /= 0 || gammaArg (realPart z)
 
 eps :: RealFloat a => a
 eps = eps'
@@ -29,7 +36,9 @@ eps = eps'
         eps' = encodeFloat 1 (1 - floatDigits eps')
 
 infix 4 ~=
-x ~= y 
+(~=) :: (Ord a, Num a, ?eps::a, ?mag::t -> a, Num t)
+     => t -> t -> Bool
+x ~= y
     =  absErr <= ?eps
     || absErr <= ?eps * min (?mag x) (?mag y)
     where absErr = ?mag (x-y)
@@ -37,19 +46,20 @@ x ~= y
 isSane :: RealFloat a => a -> Bool
 isSane x = all (\f -> not (f x)) [isNaN, isInfinite, isDenormalized]
 
-tests = 
+tests :: [Test]
+tests =
     [ testGroup "Float"
-        [ testGroup "Native"  (realTests gamma (lnGamma :: Float -> Float))
-        , testGroup "Complex" (complexTests gamma (lnGamma :: Complex Float -> Complex Float))
+        [ testGroup "Native"  (realTests G.gamma (G.lnGamma :: Float -> Float))
+        , testGroup "Complex" (complexTests G.gamma (G.lnGamma :: Complex Float -> Complex Float))
         ]
     , testGroup "Double"
-        [ testGroup "Native"  (realTests    gamma (lnGamma :: Double -> Double))
+        [ testGroup "Native"  (realTests    G.gamma (G.lnGamma :: Double -> Double))
         , testGroup "FFI"     (realTests    tgamma lgamma)
-        , testGroup "Complex" (complexTests gamma (lnGamma :: Complex Double -> Complex Double))
+        , testGroup "Complex" (complexTests G.gamma (G.lnGamma :: Complex Double -> Complex Double))
         ]
     ]
 
-realTests :: (Arbitrary a, Gamma a, Show a, RealFloat a)
+realTests :: (Arbitrary a, G.Gamma a, Show a, RealFloat a)
           => (a -> a) -> (a -> a) -> [Test]
 realTests gamma lnGamma = 
     let ?mag = abs
@@ -57,10 +67,10 @@ realTests gamma lnGamma =
         ?complex = False
      in [ testGroup "gamma"       (realGammaTests    gamma)
         , testGroup "lnGamma"     (realLogGammaTests gamma lnGamma)
-        , testGroup "lnFactorial" (logFactorialTests lnGamma lnFactorial)
+        , testGroup "lnFactorial" (logFactorialTests lnGamma G.lnFactorial)
         ]
 
-complexTests :: (Arbitrary a, Gamma (Complex a), Gamma a, Show a, RealFloat a)
+complexTests :: (Arbitrary a, G.Gamma (Complex a), G.Gamma a, Show a, RealFloat a)
              => (Complex a -> Complex a) -> (Complex a -> Complex a) -> [Test]
 complexTests gamma lnGamma = 
     let ?mag = magnitude
@@ -68,21 +78,21 @@ complexTests gamma lnGamma =
         ?complex = True
      in [ testGroup "gamma"   (complexGammaTests    gamma)
         , testGroup "lnGamma" (complexLogGammaTests gamma lnGamma)
-        , testGroup "lnFactorial" (logFactorialTests lnGamma lnFactorial)
+        , testGroup "lnFactorial" (logFactorialTests lnGamma G.lnFactorial)
         ]
 
 realGammaTests
     :: (Arbitrary a, ?mag::a -> t, ?complex::Bool, Show a, RealFloat a, RealFloat t)
     => (a -> a) -> [Test]
 realGammaTests gamma = 
-    gammaTests gamma id (const 0) ++
+    gammaTests gamma ++
     [ testProperty "between factorials" $ \(Positive x) -> 
-        let gam x = fromInteger (product [1..x-1])
+        let gam w = fromInteger (product [1..w-1])
             gamma_x = gamma x `asTypeOf` eps
          in x > 2 && isSane gamma_x
             ==> gam (floor x) <= gamma_x && gamma_x <= gam (ceiling x)
     , testProperty "agrees with factorial" $ \(Positive x) ->
-        let gam x = fromInteger (product [1..x-1])
+        let gam w = fromInteger (product [1..w-1])
             gamma_x = gamma (fromInteger x)
          in isSane gamma_x ==> 
             let ?eps = 16*eps in gam x ~= gamma_x
@@ -114,17 +124,17 @@ realGammaTests gamma =
 
 
 complexGammaTests
-    :: (Arbitrary a1, Gamma a1, ?mag::Complex a1 -> a, ?eps::a,
+    :: (Arbitrary a1, G.Gamma a1, ?mag::Complex a1 -> a, ?eps::a,
         ?complex::Bool, Show a1, RealFloat a1, RealFloat a)
     => (Complex a1 -> Complex a1) -> [Test]
 complexGammaTests gamma = 
-    gammaTests gamma realPart imagPart ++
+    gammaTests gamma ++
     [ testProperty "conjugate" $ \x -> 
         let gam = gamma x
          in isSane (magnitude gam) ==> conjugate gam ~= gamma (conjugate x)
     , testProperty "real argument" $ \(Positive x) ->
         let z = x :+ 0
-            gam = Math.Gamma.gamma x
+            gam = G.gamma x
          in isSane gam ==> 
             let ?mag = abs; ?eps = 512 * eps
              in gam ~= realPart (gamma z)
@@ -133,8 +143,8 @@ complexGammaTests gamma =
 gammaTests
     :: (Arbitrary t2, ?mag::t2 -> a, ?complex::Bool, Show t2,
        RealFloat a, Floating t2)
-    => (t2 -> t2) -> t -> t1 -> [Test]
-gammaTests gamma real imag =
+    => (t2 -> t2) -> [Test]
+gammaTests gamma =
     [ testProperty "increment arg" $ \x ->
         let a = gamma x
             b = gamma (x + 1)
@@ -200,7 +210,7 @@ realLogGammaTests gamma lnGamma =
         ?complex = False
      in logGammaTests gamma lnGamma id (const 0) ++
         [ testProperty "between factorials" $ \(Positive x) -> 
-            let gam x = sum $ map (log.fromInteger) [1..x-1]
+            let gam w = sum $ map (log.fromInteger) [1 .. w-1]
                 gamma_x = lnGamma x `asTypeOf` eps
              in x > 2 && isSane gamma_x
                 ==> gam (floor x) <= gamma_x && gamma_x <= gam (ceiling x)
@@ -213,7 +223,7 @@ realLogGammaTests gamma lnGamma =
         ]
 
 complexLogGammaTests
-    :: (Arbitrary a, Gamma a, Show a, RealFloat a)
+    :: (Arbitrary a, G.Gamma a, Show a, RealFloat a)
     => (Complex a -> Complex a) -> (Complex a -> Complex a) -> [Test]
 complexLogGammaTests gamma lnGamma = 
     let ?mag = magnitude
@@ -221,7 +231,7 @@ complexLogGammaTests gamma lnGamma =
      in logGammaTests gamma lnGamma realPart imagPart ++
         [ testProperty "real argument" $ \(Positive x) ->
             let z = x :+ 0
-                gam = Math.Gamma.lnGamma x
+                gam = G.lnGamma x
              in isSane gam ==> 
                 let ?eps = 8 * eps
                  in (gam :+ 0) ~= lnGamma z
