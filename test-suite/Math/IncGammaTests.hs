@@ -1,5 +1,7 @@
 {-# LANGUAGE ImplicitParams #-}
-module Math.IncGammaTests where
+module Math.IncGammaTests
+    ( tests
+    ) where
 
 import Math.GammaTests                      (eps, isSane, (~=))
 
