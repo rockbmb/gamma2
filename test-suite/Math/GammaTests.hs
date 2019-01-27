@@ -244,5 +244,5 @@ logFactorialTests lnGamma lnFactorial =
     [ testProperty "agrees with lnGamma" $ \x ->
         let gam = lnGamma (fromInteger x + 1)
          in isSane (?mag gam)
-            ==> gam ~= lnFactorial x
+            ==> let ?eps = 64*eps in gam ~= lnFactorial x
     ]
