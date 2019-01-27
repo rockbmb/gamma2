@@ -28,11 +28,10 @@ class (Eq a, Floating a, Factorial a) => Gamma a where
         | z == abs z    = exp (lnGamma z)
         | otherwise     = pi / (sin (pi * z) * exp (lnGamma (1-z)))
 
-
     -- |Natural log of the gamma function
     lnGamma :: a -> a
     lnGamma z = log (gamma z)
-    
+
     -- |Natural log of the factorial function
     lnFactorial :: Integral b => b -> a
     lnFactorial n = lnGamma (fromIntegral n+1)

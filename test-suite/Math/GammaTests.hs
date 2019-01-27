@@ -14,7 +14,7 @@ import Math.Reference                       (err, lgamma, tgamma)
 
 import Data.Complex                         (Complex (..), conjugate, imagPart,
                                              magnitude, realPart)
-import Test.Framework                       (testGroup, Test)
+import Test.Framework                       (Test, testGroup)
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck                      (Arbitrary, NonNegative (..), Positive (..),
                                              (==>))
@@ -105,10 +105,10 @@ realGammaTests gamma =
         let a = gamma x
          in isSane a ==> snd (err gamma x) <= 256*eps
     , testProperty "monotone when x>2" $ \(Positive x) ->
-        let x' = x * (1+eps)
+        let x' = x * (1 + 256*eps)
             a = gamma x
             b = gamma x'
-         in (x > 2) && (x <= x) && all isSane [a,b] ==> a <= b
+         in (x > 2) && (x <= x') && all isSane [a,b] ==> a <= b
     , testProperty "domain check" $ \x ->
         let a = gamma x
          in not (isInfinite a) ==>

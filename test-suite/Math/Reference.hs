@@ -39,12 +39,8 @@ foreign import ccall "math.h lgamma" lgamma :: Double -> Double
 foreign import ccall "math.h tgamma" tgamma :: Double -> Double
 
 err :: RealFrac a => (a -> a) -> a -> (a,a)
-err approxGamma x = (realToFrac' absErr, realToFrac' relErr)
+err approxGamma x = (realToFrac absErr, realToFrac relErr)
     where
-        -- BigFloat's fromRational implementation chokes on zero
-        realToFrac' 0 = 0
-        realToFrac' e = realToFrac e
-        
         x' = realToFrac x
         
         y = realToFrac (approxGamma x)
