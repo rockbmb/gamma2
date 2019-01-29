@@ -5,20 +5,23 @@ stability:              provisional
 cabal-version:          >= 1.10
 build-type:             Simple
 
-author:                 James Cook <mokus@deepbondi.net>
-maintainer:             James Cook <mokus@deepbondi.net>
-                        Alexandre Rodrigues Baldé <alexandrer_b@outlook.com>
+author:                 James Cook <mokus ΑΤ deepbondi dοt net>
+maintainer:             James Cook <mokus ΑΤ deepbondi dοt net>,
+                        Alexandre Rodrigues Baldé <alexandrer_b ΑΤ outlook dοt com>
 license:                PublicDomain
 homepage:               https://github.com/rockbmb/gamma2
+bug-reports:            https://github.com/rockbmb/gamma2/issues
 
 category:               Math, Numerical
 synopsis:               Gamma function and related functions.
-description:            Approximations of the gamma function, incomplete gamma 
+description:            Approximations of the gamma function, incomplete gamma
                         functions, generalized gamma functions, and factorials.
 
 tested-with:            GHC==8.0.2, GHC==8.2.2, GHC==8.4.3, GHC==8.6.1
 
-extra-source-files:     extras/*.hs
+extra-source-files:     extras/*.hs,
+                        CHANGES.md,
+                        README.md
 
 source-repository head
   type: git
