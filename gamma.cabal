@@ -36,7 +36,7 @@ library
                         Math.Gamma.Stirling
                         Math.Gamma.Lanczos
   build-depends:        base >= 4.9 && <5,
-                        continued-fractions >= 0.9.1,
+                        continued-fractions >= 0.10,
                         converge,
                         template-haskell,
                         vector >= 0.5
