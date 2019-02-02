@@ -29,7 +29,7 @@ source-repository head
 
 library
   hs-source-dirs:       src
-  ghc-options:          -Wall -Werror
+  ghc-options:          -Wall
   exposed-modules:      Math.Factorial
                         Math.Gamma
                         Math.Gamma.Incomplete
@@ -46,7 +46,7 @@ test-suite gamma-tests
   ghc-options:          -threaded
   hs-source-dirs:       test-suite
   default-language:     Haskell2010
-  ghc-options:          -Wall -Werror
+  ghc-options:          -Wall
   type:                 exitcode-stdio-1.0
   main-is:              Test.hs
   build-depends:
