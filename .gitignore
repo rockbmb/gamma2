@@ -17,10 +17,12 @@ Icon?
 # Haskell #
 ###########
 
+cabal.project.local*
 dist
+dist-newstyle
+.ghc.environment*
+stack.yaml
 *.o
 *.hi
 *.chi
 *.chs.h
-
-

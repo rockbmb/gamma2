@@ -1,7 +1,12 @@
 {-# LANGUAGE ParallelListComp #-}
 -- |Stirling's approximation to the gamma function and utility functions for
 -- selecting coefficients.
-module Math.Gamma.Stirling (lnGammaStirling, cs, s, abs_s, terms) where
+module Math.Gamma.Stirling
+    ( lnGammaStirling
+    , cs
+    , s
+    , abs_s
+    , terms) where
 
 import qualified Data.Vector as V
 
