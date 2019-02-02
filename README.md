@@ -1,7 +1,7 @@
 Gamma
 =========
 
-[![Build Status](https://travis-ci.org/rockbmb/gamma2.svg?branch=master)](https://travis-ci.org/rockbmb/gamma2)
+[![Build Status](https://travis-ci.com/rockbmb/gamma2.svg?branch=master)](https://travis-ci.com/rockbmb/gamma2)
 
 `gamma` is a number theory package written in Haskell that aims to provide its users
 with the following functionality:
