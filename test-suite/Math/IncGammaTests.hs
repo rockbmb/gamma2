@@ -80,7 +80,7 @@ incompleteGammaTests epsi =
                     b = upperGamma s x;     b' = exp a
                     
                  in all isSane [a,a',b,b'] ==> 
-                    let ?eps = 128*epsi*(1 + recip (abs x))
+                    let ?eps = 128*(1 + recip (abs x))*epsi
                      in a ~= a' || b ~= b'
             ]
         , testGroup "lowerGamma"
