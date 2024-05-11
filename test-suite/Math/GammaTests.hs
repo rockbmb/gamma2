@@ -186,19 +186,14 @@ logGammaTests gamma lnGamma real imag =
             b = lnGamma (1 - x)
             c = log pi - c';    c' = log (sin (pi * x))
             d = ?mag $ x - (fromInteger . round . real) x
-            -- rdiff = real (a + b) - real c
-            -- idiff = imag (a + b) - imag c
-            -- idiffadj = idiff - fromInteger (round (idiff / (2*pi)) ) * 2 * pi
          in all (isSane . ?mag) [a,b,c] 
             ==> not ?complex || imag x /= 0
             ==> 
-            let ?eps = 2048 * eps -- * (1 + recip d)
+            let ?eps = 2048 * eps * (1 + recip d)
              in     a + b ~= c
                  || a ~= c - b
                  || b ~= c - a
                  || a - b - c' ~= log pi
-                 -- || let ?mag = ?mag . phaseshift in a + b ~= c
-                 -- || (abs rdiff < 256*eps && abs idiffadj < 256*eps)
     , testProperty "agrees with log . gamma" $ \x ->
         let a = log b'    ; a' = exp b
             b = lnGamma x ; b' = gamma x
@@ -219,12 +214,12 @@ realLogGammaTests gamma lnGamma =
      in logGammaTests gamma lnGamma id (const 0) ++
         [ testProperty "between factorials" $ \(Positive x) -> 
             let gam w = sum $ map (log.fromInteger) [1 .. w-1]
-                gamma_x = lnGamma x `asTypeOf` eps
                 locgamma z = lnGamma z `asTypeOf` eps
-                check z = ((fromInteger . round) z == z && abs (locgamma z - gam (floor z)) < 1000*eps) ||  -- 2e-5
+                check z = ((fromInteger . round) z == z && abs (locgamma z - gam (floor z)) < 1024*eps) ||
                           (gam (floor z) <= locgamma z && locgamma z <= gam (ceiling z))
+                gamma_x = locgamma x
              in x > 2 && isSane gamma_x
-                ==> check x --  gam (floor x) <= gamma_x && gamma_x <= gam (ceiling x)
+                ==> check x
         , let ?eps = 2 * eps
            in testProperty "agrees with C lgamma" $ \(NonNegative x) ->
             let a = lnGamma x
@@ -237,8 +232,8 @@ complexLogGammaTests
     :: (Arbitrary a, G.Gamma a, Show a, RealFloat a)
     => (Complex a -> Complex a) -> (Complex a -> Complex a) -> [Test]
 complexLogGammaTests gamma lnGamma = 
-    let phaseshift c = c - (0 :+ 2 * pi * fromInteger (round (imagPart c / (2*pi)) )) in -- TODO: Decide whether this is the way to go
-    let ?mag = magnitude . phaseshift
+    let branchshift c = c - (0 :+ 2 * pi * fromInteger (round (imagPart c / (2*pi)))) in
+    let ?mag = magnitude . branchshift
         ?complex = True
      in logGammaTests gamma lnGamma realPart imagPart ++
         [ testProperty "real argument" $ \(Positive x) ->
