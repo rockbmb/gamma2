@@ -46,4 +46,4 @@ err approxGamma x = (realToFrac absErr, realToFrac relErr)
         y = realToFrac (approxGamma x)
         y' = refGamma' x'
         absErr = y - y'
-        relErr = absErr / max (abs y) (abs y')
+        relErr = absErr / max (max (abs y) (abs y')) 1

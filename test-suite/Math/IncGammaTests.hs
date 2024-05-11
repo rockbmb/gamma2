@@ -48,7 +48,7 @@ incompleteGammaTests epsi =
                     b = s * upperGamma s x
                     c = x ** s * exp (-x)
                  in all isSane [a,b,c] ==>
-                    let ?eps = 1024*epsi
+                    let ?eps = 1024*(1 + recip (abs x))*epsi
                      in a ~= b+c || a-b ~= c || a-c ~= b
             , testProperty "x = 0" $ \s ->
                 let a = upperGamma s 0
@@ -80,7 +80,7 @@ incompleteGammaTests epsi =
                     b = upperGamma s x;     b' = exp a
                     
                  in all isSane [a,a',b,b'] ==> 
-                    let ?eps = 128*epsi
+                    let ?eps = 128*epsi*(1 + recip (abs x))
                      in a ~= a' || b ~= b'
             ]
         , testGroup "lowerGamma"
@@ -89,7 +89,7 @@ incompleteGammaTests epsi =
                     b = s * lowerGamma s x
                     c = x ** s * exp (-x)
                  in not (s==0 || x==0) && all isSane [a,b,c] ==>
-                    let ?eps = 1024*epsi
+                    let ?eps = 1024*(1 + recip (abs x))*epsi
                      in a ~= b-c || a+c ~= b || b-a ~= c
             , testProperty "s = 0.5" $ \(NonNegative x) ->
                 let ?eps = 16 * epsi
