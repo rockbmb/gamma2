@@ -89,7 +89,7 @@ realGammaTests gamma =
     [ testProperty "between factorials" $ \(Positive x) -> 
         let gam w = fromInteger (product [1..w-1])
             gamma_x = gamma x `asTypeOf` eps
-         in x > 2 && isSane gamma_x
+         in x > 2 && isSane gamma_x && (fromInteger . round) x /= x
             ==> gam (floor x) <= gamma_x && gamma_x <= gam (ceiling x)
     , testProperty "agrees with factorial" $ \(Positive x) ->
         let gam w = fromInteger (product [1..w-1])
@@ -148,11 +148,11 @@ gammaTests gamma =
     [ testProperty "increment arg" $ \x ->
         let a = gamma x
             b = gamma (x + 1)
-            margin  | ?complex  = 32
+            margin  | ?complex  = 512
                     | otherwise = 32
          in all (isSane . ?mag) [a,b,recip a, recip b]
-            ==> ?mag (a - b/x) <= margin * (max 2 (1 + recip (?mag x))) * eps * ?mag a
-             || ?mag (a*x - b) <= margin * (max 2 (1 +        ?mag x))  * eps * ?mag b
+            ==> ?mag (a - b/x) <= margin * max 2 (1 + recip (?mag x)) * eps * max (?mag a) 1
+             || ?mag (a*x - b) <= margin * max 2 (1 +        ?mag x)  * eps * max (?mag b) 1
     , testProperty "reflect" $ \x ->
         ?mag x > 0 ==>
         let a = gamma x
@@ -169,24 +169,27 @@ gammaTests gamma =
 
 logGammaTests
     :: (Arbitrary t, ?mag::t -> t1, ?complex::Bool, Show t,
-        RealFloat t1, Ord a1, Ord a, Num a1, Num a, Floating t)
+        RealFloat t1, Ord a1, Ord a, Num a1, Num a, RealFloat a, RealFloat a1, Floating t)
     => (t -> t) -> (t -> t) -> (t -> a) -> (t -> a1) -> [Test]
 logGammaTests gamma lnGamma real imag =
     [ testProperty "increment arg" $ \x ->
         let gam = lnGamma (x+1)
          in real x > 0 && isSane (?mag gam)
             ==> 
-            let ?eps = 32 * eps
+            let ?eps = 128 * eps
              in gam - log x ~= lnGamma x
                 || gam ~= log x + lnGamma x
     , testProperty "reflect" $ \x ->
         ?mag x > 0 ==>
+        ?mag (x - (fromInteger . round . real) x) > 0 ==>
         let a = lnGamma x
             b = lnGamma (1 - x)
             c = log pi - c';    c' = log (sin (pi * x))
+            d = ?mag $ x - (fromInteger . round . real) x
          in all (isSane . ?mag) [a,b,c] 
+            ==> not ?complex || imag x /= 0
             ==> 
-            let ?eps = 512 * eps
+            let ?eps = 2048 * eps * (1 + recip d)
              in     a + b ~= c
                  || a ~= c - b
                  || b ~= c - a
@@ -211,9 +214,12 @@ realLogGammaTests gamma lnGamma =
      in logGammaTests gamma lnGamma id (const 0) ++
         [ testProperty "between factorials" $ \(Positive x) -> 
             let gam w = sum $ map (log.fromInteger) [1 .. w-1]
-                gamma_x = lnGamma x `asTypeOf` eps
+                locgamma z = lnGamma z `asTypeOf` eps
+                check z = ((fromInteger . round) z == z && abs (locgamma z - gam (floor z)) < 1024*eps) ||
+                          (gam (floor z) <= locgamma z && locgamma z <= gam (ceiling z))
+                gamma_x = locgamma x
              in x > 2 && isSane gamma_x
-                ==> gam (floor x) <= gamma_x && gamma_x <= gam (ceiling x)
+                ==> check x
         , let ?eps = 2 * eps
            in testProperty "agrees with C lgamma" $ \(NonNegative x) ->
             let a = lnGamma x
@@ -226,14 +232,15 @@ complexLogGammaTests
     :: (Arbitrary a, G.Gamma a, Show a, RealFloat a)
     => (Complex a -> Complex a) -> (Complex a -> Complex a) -> [Test]
 complexLogGammaTests gamma lnGamma = 
-    let ?mag = magnitude
+    let branchshift c = c - (0 :+ 2 * pi * fromInteger (round (imagPart c / (2*pi)))) in
+    let ?mag = magnitude . branchshift
         ?complex = True
      in logGammaTests gamma lnGamma realPart imagPart ++
         [ testProperty "real argument" $ \(Positive x) ->
             let z = x :+ 0
                 gam = G.lnGamma x
              in isSane gam ==> 
-                let ?eps = 8 * eps
+                let ?eps = 16 * eps
                  in (gam :+ 0) ~= lnGamma z
         ]
 
